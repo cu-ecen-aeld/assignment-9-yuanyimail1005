@@ -4,3 +4,10 @@ config BR2_PACKAGE_AESD_ASSIGNMENTS
 	help
 	  Includes the writer executable, finder.sh and tester.sh in the kernel image.
 	  Used to understand buildroot external trees and package builds.
+
+config BR2_PACKAGE_USE_AESD_CHAR_DEVICE
+	bool "Use AESD Character Device"
+	default y
+	help
+	  Loads aesd character device for assignment 8.
+	  Prints assignment text to aesdchar instead of file.

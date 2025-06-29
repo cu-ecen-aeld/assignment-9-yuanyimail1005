@@ -1,0 +1,56 @@
+#!/bin/sh
+
+start(){
+
+module="aesdchar"
+mode="664"
+
+# Group: since distributions do it differently, look for wheel or use staff
+if grep -q '^staff:' /etc/group; then
+    group="staff"
+else
+    group="wheel"
+fi
+
+# invoke insmod 
+/sbin/insmod /lib/modules/"$(uname -r)"/extra/aesdchar.ko
+
+# retrieve major number
+major=$(awk "\$2==\"$module\" {print \$1}" /proc/devices)
+
+# Remove stale nodes and replace them, then give gid and perms
+
+rm -f /dev/$module
+mknod /dev/$module c $major 0
+chgrp $group /dev/aesdchar 
+chmod $mode  /dev/aesdchar
+
+}
+
+stop(){
+
+module="aesdchar"
+
+# invoke rmmod
+/sbin/rmmod $module
+
+# Remove stale nodes
+
+rm -f /dev/$module
+
+}
+
+case "$1" in
+	start)
+		echo  "Starting aesdchar"
+		start
+		;;
+	stop)
+		echo "Stopping aesdchar"
+		stop
+		;;
+	*)
+	echo "Usage: $0 {start|stop}"
+	exit 1
+esac
+
